@@ -72,6 +72,12 @@ CREATE TABLE IF NOT EXISTS settings (
     value TEXT NOT NULL,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_imports_statement_month ON imports(statement_month);
+CREATE INDEX IF NOT EXISTS idx_imports_file_hash ON imports(file_hash);
+CREATE INDEX IF NOT EXISTS idx_broker_trades_import_id ON broker_trades(import_id);
+CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date);
+CREATE INDEX IF NOT EXISTS idx_assets_placed_in_service_date ON assets(placed_in_service_date);
 """
 
 
