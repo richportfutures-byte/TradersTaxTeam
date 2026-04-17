@@ -3,7 +3,12 @@ import pandas as pd
 import streamlit as st
 
 from ledgerflow.db import connect, init_db
-from ledgerflow.ingest import ingest_broker_csv
+from ledgerflow.ingest import (
+    DuplicateImportError,
+    InvalidStatementMonthError,
+    ingest_broker_csv,
+)
+from ledgerflow.parse_broker_csv import BrokerCSVValidationError
 from ledgerflow.reconcile import reconcile_import
 from ledgerflow.metrics import get_period_summary, get_ytd_summary, quarterly_profit_after_costs
 from ledgerflow.taxes import estimate_taxes, quarterly_estimates
@@ -123,9 +128,17 @@ with tab_import:
         tmp_path.write_bytes(uploaded.getvalue())
         st.caption(f"Staged file: {tmp_path}")
         if st.button("Import & Reconcile now"):
-            import_id = ingest_broker_csv(DB_PATH, tmp_path, statement_month)
-            reconcile_import(DB_PATH, import_id, tolerance=float(tol))
-            st.success(f"Imported import_id={import_id}. Refresh the sidebar selector to view it.")
+            try:
+                import_id = ingest_broker_csv(DB_PATH, tmp_path, statement_month)
+                reconcile_import(DB_PATH, import_id, tolerance=float(tol))
+            except DuplicateImportError as exc:
+                st.error(str(exc))
+            except (InvalidStatementMonthError, BrokerCSVValidationError, ValueError) as exc:
+                st.error(f"Import blocked: {exc}")
+            except Exception as exc:
+                st.error(f"Unexpected import failure: {exc}")
+            else:
+                st.success(f"Imported import_id={import_id}. Refresh the sidebar selector to view it.")
 
     st.subheader("Recent imports")
     st.dataframe(imports, use_container_width=True)
