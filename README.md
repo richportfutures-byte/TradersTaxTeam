@@ -127,16 +127,13 @@ This repository does not currently attempt to do the following:
 ### Setup
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate   # macOS/Linux
-# .venv\Scripts\activate    # Windows
-pip install -e .
+uv sync
 ```
 
 ### Run
 
 ```bash
-streamlit run app.py
+uv run streamlit run app.py
 ```
 
 The app stores data in a local SQLite file under `data/ledgerflow.sqlite`.

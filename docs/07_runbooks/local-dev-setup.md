@@ -2,14 +2,12 @@
 
 ## Requirements
 - Python 3.11+
-- virtualenv/venv
+- uv
 
 ## Steps
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-streamlit run app.py
+uv sync
+uv run streamlit run app.py
 ```
 
 ## Storage
